@@ -1,5 +1,6 @@
 import React from 'react';
 import {findField} from "../controllers/Mouse";
+import {findCenter} from "../helpers/board";
 
 export default function Board() {
     const refBoard = React.useRef(null);
@@ -29,6 +30,17 @@ export default function Board() {
         drawLine(context, {x: 0, y: 200}, {x: 300, y: 200});
     };
 
+    const drawMoves = (context) => {
+        crosses.forEach((cross) => {
+            const center = findCenter(cross);
+            drawCross(context, center);
+        });
+        noughts.forEach((nought) => {
+            const center = findCenter(nought);
+            drawNought(context, center);
+        })
+    };
+
     const drawNought = (context, center) => {
         context.moveTo(center.x + 40, center.y);
         context.arc(center.x, center.y, 40, 0, 2*Math.PI, false);
@@ -42,7 +54,9 @@ export default function Board() {
     React.useEffect(() => {
         const context = refBoard.current.getContext('2d');
         context.beginPath();
+        context.clearRect(0, 0, 300, 300);
         drawBoard(context);
+        drawMoves(context);
         context.strokeStyle = 'gray';
         context.stroke();
     });
