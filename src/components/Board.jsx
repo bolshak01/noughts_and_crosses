@@ -1,6 +1,7 @@
 import React from 'react';
 import {findField} from "../controllers/Mouse";
 import {findCenter} from "../helpers/board";
+import {checkFinal} from "../helpers/logic";
 
 export default function Board() {
     const refBoard = React.useRef(null);
@@ -15,6 +16,12 @@ export default function Board() {
         } else {
             setMove('cross')
         }
+    };
+
+    const isFieldOccupied = (move) => {
+        return !!(crosses.find((cross) => cross === move)
+            || noughts.find((nought) => nought === move));
+
     };
 
     const drawLine = (context, start, end) => {
@@ -51,6 +58,13 @@ export default function Board() {
         drawLine(context, {x: center.x + 40, y: center.y - 40}, {x: center.x - 40, y: center.y + 40});
     };
 
+    const drawFinal = (context, combination) => {
+        const fCenter = findCenter(combination[0]);
+        const sCenter = findCenter(combination[2]);
+        drawLine(context, fCenter, sCenter);
+        context.stroke();
+    };
+
     React.useEffect(() => {
         const context = refBoard.current.getContext('2d');
         context.beginPath();
@@ -59,6 +73,15 @@ export default function Board() {
         drawMoves(context);
         context.strokeStyle = 'gray';
         context.stroke();
+        const final = checkFinal(crosses, noughts);
+        if (final) {
+            drawFinal(context, final.combination);
+        }
+        if (final) {
+            alert(final.winner);
+            setNoughts([]);
+            setCrosses([]);
+        }
     });
 
     const setField = (field) => {
@@ -73,6 +96,9 @@ export default function Board() {
 
     const mouseControl = (e) => {
         const field = findField({x: e.clientX - window.innerWidth/2 + 150, y: e.clientY});
+        if (isFieldOccupied(field)) {
+            return;
+        }
         setField(field);
         revertMove();
     };
