@@ -1,4 +1,5 @@
 import React from 'react';
+import {findField} from "../controllers/Mouse";
 
 export default function Board(props) {
     const refBoard = React.useRef(null);
@@ -23,10 +24,16 @@ export default function Board(props) {
         drawBoard(context);
     });
 
+    const mouseControl = (e) => {
+        const field = findField({x: e.clientX - window.innerWidth/2 + 150, y: e.clientY});
+        alert(field);
+    };
+
     return <canvas
         ref={refBoard}
         width='300px'
         height='300px'
+        onClick={mouseControl}
         >
         Your browser does not support canvas
     </canvas>
